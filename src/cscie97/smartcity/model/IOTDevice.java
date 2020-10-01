@@ -22,4 +22,11 @@ public abstract class IOTDevice {
 	public String getId() {
 		return this.id;
 	}
+
+	public String toString() { 
+        String result = (
+            "IoT device: " + this.getId() 
+        ); 
+        return result;
+    }
 }

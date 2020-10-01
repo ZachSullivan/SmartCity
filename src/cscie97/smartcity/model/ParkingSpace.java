@@ -2,20 +2,16 @@ package cscie97.smartcity.model;
 
 public class ParkingSpace extends IOTDevice {
 
-	public ParkingSpace(String id, boolean enabled, Location location) {
-		super(id, enabled, location);
-		// TODO Auto-generated constructor stub
-	}
-
 	private int fee;
-
 	private Vehicle vehicle;
-
 	private Person owner;
-
-	private static int entryTime;
-
+	private int entryTime; 	// Note changed from static to non static
 	private int exitTime;
+
+	public ParkingSpace(String id, Location location, boolean enabled, int rate) {
+		super(id, enabled, location);
+		this.fee = rate;
+	}
 
 	public void generateBill() {
 

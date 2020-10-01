@@ -4,15 +4,19 @@ import java.util.ArrayList;
 
 public abstract class Vehicle extends IOTDevice {
 
-	public Vehicle(String id, boolean enabled, Location location) {
+	private String activity; 	// Had to add acivity variable
+	private String owner;
+	private int capacity;
+	private int fee; 			// Had to add a fee variable
+	private ArrayList<Person> passengers;
+
+	public Vehicle(String id, boolean enabled, Location location, String activity, int capacity, int fee) {
 		super(id, enabled, location);
-		// TODO Auto-generated constructor stub
+		this.activity = activity;
+		this.capacity = capacity;
+		this.fee = fee;
 	}
 
-	private String owner;
 
-	private int capacity;
-
-	private ArrayList<Person> passengers;
 
 }

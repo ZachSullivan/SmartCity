@@ -44,8 +44,8 @@ update info-kiosk city_1:kiosk_2 image https://www.google.com/maps/place/Cambrid
 # Define a street light
 # define street-light <city_id>:<device_id> lat <float> long <float> enabled (true|false) brightness <int>
 
-define street-light city_1:sl_1 lat 42.3770 long  -71.1167 enabled  true  brightness 8
-define street-light city_1:sl_2 lat 42.3749 long  -71.1218 enabled  true  brightness 5
+define street-light city_1:sl_1 lat 42.3770 long -71.1167 enabled true  brightness 8
+define street-light city_1:sl_2 lat 42.3749 long -71.1218 enabled true  brightness 5
 
 
 # Update a street light
@@ -65,8 +65,8 @@ define parking-space city_1:ps_2 lat 42.3744 long -71.1203 enabled true  rate 25
 # Update a parking space
 # update parking-space <city_id>:<device_id> [enabled (true|false)] [rate <int>]
 
-update parking-space city_1:ps_1  rate 50
-update parking-space city_1:ps_2  rate 50
+update parking-space city_1:ps_1 rate 50
+update parking-space city_1:ps_2 rate 50
 
 
 # Define a robot

@@ -209,6 +209,196 @@ public class CommandProcessor {
                             
                             break;
                         
+                        case "parking-space":
+                            System.out.println("Defining a new Parking Space");
+
+                            // Command should specify the following arguments
+                            args = new String[]{"parking-space", "lat", "long", "enabled", "rate"};
+                            // Populate a new mapping of arguments to properties
+                            cmdMap = parseArgs (cmds, args);
+
+                            // Need to split the city id from the device id
+                            cityId = null; 
+                            deviceId = null;
+
+                            try {
+                                String ids[] = cmdMap.get("parking-space").split(":"); 
+                                cityId = ids[0]; 
+                                deviceId = ids[1];
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                e.printStackTrace();
+                            }
+                            float parkingLat = 0;
+                            float parkingLong = 0;
+                            int rate = 0;
+                            // Location constructor arguments accept floats, must convert
+                            // Constructor accepts ints, must convert
+                            try {
+                                parkingLat = Float.parseFloat(cmdMap.get("lat"));
+                                parkingLong = Float.parseFloat(cmdMap.get("long"));
+                                rate = Integer.parseInt(cmdMap.get("rate"));
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                            }
+
+                            deviceLocation = new Location(parkingLat, parkingLong);
+                            
+                            deviceEnabled = false;
+                            if (cmdMap.get("enabled").toLowerCase().equals("true")) {
+                                deviceEnabled = true;
+                            }
+
+                            // Create a new street sign object
+                            IOTDevice parkingSpace = new ParkingSpace(deviceId, deviceLocation, deviceEnabled, rate);
+                            // Add the iotdevice to the user specified city  
+                            System.out.println("Created new IoTDevice: " + parkingSpace + " for city: " + modelService.defineDevice(parkingSpace, cityId));
+                            
+                            break;
+                        
+                        case "street-light":
+                            System.out.println("Defining a new Street Light");
+
+                            // Command should specify the following arguments
+                            args = new String[]{"street-light", "lat", "long", "enabled", "brightness"};
+                            // Populate a new mapping of arguments to properties
+                            cmdMap = parseArgs (cmds, args);
+
+                            // Need to split the city id from the device id
+                            cityId = null; 
+                            deviceId = null;
+
+                            try {
+                                String ids[] = cmdMap.get("street-light").split(":"); 
+                                cityId = ids[0]; 
+                                deviceId = ids[1];
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                e.printStackTrace();
+                            }
+                            float lightLat = 0;
+                            float lightLong = 0;
+                            int brightness = 0;
+                            // Location constructor arguments accept floats, must convert
+                            // Constructor accepts ints, must convert
+                            try {
+                                lightLat = Float.parseFloat(cmdMap.get("lat"));
+                                lightLong = Float.parseFloat(cmdMap.get("long"));
+                                brightness = Integer.parseInt(cmdMap.get("brightness"));
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                            }
+
+                            deviceLocation = new Location(lightLat, lightLong);
+                            
+                            deviceEnabled = false;
+                            if (cmdMap.get("enabled").toLowerCase().equals("true")) {
+                                deviceEnabled = true;
+                            }
+
+                            // Create a new street sign object
+                            IOTDevice light = new StreetLight(deviceId, deviceLocation, deviceEnabled, brightness);
+                            // Add the iotdevice to the user specified city  
+                            System.out.println("Created new IoTDevice: " + light + " for city: " + modelService.defineDevice(light, cityId));
+                            
+                            break;
+                        
+                        case "robot":
+                            System.out.println("Defining a new Robot");
+
+                            // Command should specify the following arguments
+                            args = new String[]{"robot", "lat", "long", "enabled", "activity"};
+                            // Populate a new mapping of arguments to properties
+                            cmdMap = parseArgs (cmds, args);
+
+                            // Need to split the city id from the device id
+                            cityId = null; 
+                            deviceId = null;
+
+                            try {
+                                String ids[] = cmdMap.get("robot").split(":"); 
+                                cityId = ids[0]; 
+                                deviceId = ids[1];
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                e.printStackTrace();
+                            }
+                            float robotLat = 0;
+                            float robotLong = 0;
+
+                            // Location constructor arguments accept floats, must convert
+                            try {
+                                robotLat = Float.parseFloat(cmdMap.get("lat"));
+                                robotLong = Float.parseFloat(cmdMap.get("long"));
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                            }
+
+                            deviceLocation = new Location(robotLat, robotLong);
+                            
+                            deviceEnabled = false;
+                            if (cmdMap.get("enabled").toLowerCase().equals("true")) {
+                                deviceEnabled = true;
+                            }
+
+                            // Create a new street sign object
+                            IOTDevice robot = new Robot(deviceId, deviceLocation, deviceEnabled, cmdMap.get("activity"));
+                            // Add the iotdevice to the user specified city  
+                            System.out.println("Created new IoTDevice: " + modelService.defineDevice(robot, cityId) + " for city: " + cityId);
+                            
+                            break;
+
+                        case "vehicle":
+                            System.out.println("Defining a new Vehicle");
+
+                            // Command should specify the following arguments
+                            args = new String[]{"vehicle", "lat", "long", "enabled", "type", "activity", "capacity", "fee"};
+                            // Populate a new mapping of arguments to properties
+                            cmdMap = parseArgs (cmds, args);
+
+                            // Need to split the city id from the device id
+                            cityId = null; 
+                            deviceId = null;
+
+                            try {
+                                String ids[] = cmdMap.get("vehicle").split(":"); 
+                                cityId = ids[0]; 
+                                deviceId = ids[1];
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                e.printStackTrace();
+                            }
+                            float vehicleLat = 0;
+                            float vehicleLong = 0;
+
+                            int capacity = 0;
+                            int fee = 0;
+                            // Location constructor arguments accept floats, must convert
+                            try {
+                                vehicleLat = Float.parseFloat(cmdMap.get("lat"));
+                                vehicleLong = Float.parseFloat(cmdMap.get("long"));
+                                capacity = Integer.parseInt(cmdMap.get("capacity"));
+                                fee = Integer.parseInt(cmdMap.get("fee"));
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                            }
+
+                            deviceLocation = new Location(vehicleLat, vehicleLong);
+                            
+                            deviceEnabled = false;
+                            if (cmdMap.get("enabled").toLowerCase().equals("true")) {
+                                deviceEnabled = true;
+                            }
+
+                            IOTDevice vehicle = null;
+                            if (cmdMap.get("type").toLowerCase().equals("car")) {
+                                vehicle = new Car(deviceId, deviceLocation, deviceEnabled, cmdMap.get("activity"), capacity, fee);
+                            } else {
+                                vehicle = new Bus(deviceId, deviceLocation, deviceEnabled, cmdMap.get("activity"), capacity, fee);
+                            }
+
+                            // Create a new street sign object
+                            // Add the iotdevice to the user specified city  
+                            System.out.println("Created new IoTDevice: " + modelService.defineDevice(vehicle, cityId) + " for city: " + cityId);
+                            
+                            break;
+
                         case "city":
                             System.out.println("Defining a new City");
 
