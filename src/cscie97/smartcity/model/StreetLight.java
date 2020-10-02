@@ -12,4 +12,12 @@ public class StreetLight extends IOTDevice {
 	public int getBrightness () {
 		return this.brightness;
 	}
+
+	public String toString() { 
+        String result = (
+			super.toString() + " is a Street Light currently enabled: " + super.getEnabled() +
+			" Brightness: " + this.getBrightness()
+        ); 
+        return result;
+    }
 }

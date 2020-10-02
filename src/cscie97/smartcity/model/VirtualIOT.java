@@ -16,6 +16,10 @@ public class VirtualIOT {
 		return this.id;
 	}
 
+	public IOTDevice getPhysicalDevice () {
+		return this.phyiscalIoT;
+	}
+
 	public String getCommand(String command) {
 		return null;
 	}

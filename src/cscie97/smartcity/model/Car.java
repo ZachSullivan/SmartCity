@@ -7,4 +7,14 @@ public class Car extends Vehicle {
 
     }
 
+    public String toString() { 
+        String result = (
+			super.toString() + " is a Car currently enabled: " + super.getEnabled() +
+            " Capacity: " + super.getCapacity() + 
+            " Fee: " + super.getFee() + 
+            " Performing: " + super.getActivity()
+        ); 
+        return result;
+    }
+
 }

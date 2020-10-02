@@ -17,4 +17,16 @@ public class ParkingSpace extends IOTDevice {
 
 	}
 
+	public int getRate() {
+		return this.fee;
+	}
+
+	public String toString() { 
+        String result = (
+			super.toString() + " is a Parking Space currently enabled: " + super.getEnabled() +
+			" Charging: " + this.getRate()
+        ); 
+        return result;
+    }
+
 }

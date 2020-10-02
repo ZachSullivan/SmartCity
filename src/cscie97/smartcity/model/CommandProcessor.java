@@ -68,6 +68,39 @@ public class CommandProcessor {
             switch(cmds[0]) {   
                 case "show":
                     switch(cmds[1]) { 
+                        case "device":
+                            // Command should specify the following arguments
+                            args = new String[]{"device"};
+                            // Populate a new mapping of arguments to properties
+                            cmdMap = parseArgs (cmds, args);
+
+                            // Check if the command denotes a specific device via a ":"
+                            if (cmdMap.get("device").contains(":")) {
+                                System.out.println("Retrieving a Device");
+                                // Need to split the city id from the device id
+                                String cityId = null; 
+                                String deviceId = null;
+                                try {
+                                    String ids[] = cmdMap.get("device").split(":"); 
+                                    cityId = ids[0]; 
+                                    deviceId = ids[1];
+                                } catch (ArrayIndexOutOfBoundsException e) {
+                                    e.printStackTrace();
+                                }
+                                System.out.println(modelService.getDevice(cityId, deviceId));
+                            } else {
+                                System.out.println("Retrieving all Devices within city: " + cmdMap.get("device"));
+
+                                // Retrieve all devices in a given city, in the form of a map
+                                Map<String, VirtualIOT> devices = modelService.getDevices(cmdMap.get("device"));
+
+                                // Iterate through the device map, displaying all physical device entries
+                                for (Map.Entry<String, VirtualIOT> deviceEntry:devices.entrySet()){
+                                    System.out.println(deviceEntry.getValue().getPhysicalDevice());
+                                }
+                            }
+                            break;
+                        
                         case "city":
                             /**
                              * NOTE THE OUTPUT OF THIS COMMAND SHOULD ALSO SHOW PEOPLE AND IOT DEVICES WITHIN THE REQUESTED CITY
@@ -75,7 +108,7 @@ public class CommandProcessor {
                              */
                             System.out.println("Retrieving City");
 
-                            // Define-city command should specify the following arguments
+                            // Command should specify the following arguments
                             args = new String[]{"city"};
                             // Populate a new mapping of arguments to properties
                             cmdMap = parseArgs (cmds, args);
@@ -88,7 +121,7 @@ public class CommandProcessor {
                     switch(cmds[1]) {
                         case "street-sign":
                             System.out.println("Updating existing Street Sign");
-
+                        
                             // When updating a streetsign, the command may specify the following arguments
                             args = new String[]{"street-sign", "enabled", "text"};
                             // Populate a new mapping of arguments to properties
@@ -105,9 +138,348 @@ public class CommandProcessor {
                                 e.printStackTrace();
                             }
 
-                            // Retrieve and update the IOTdevice
-                            //modelService.updateDevice(sign, cityId);
-                            System.out.println("Created new IoTDevice for city: " + cityId);
+
+
+                            // First retrieve the old IOTdevice
+                            IOTDevice oldDevice = modelService.getDevice(cityId, deviceId);
+
+                            // User can only modify the display text OR if the device is enabled
+                            boolean deviceEnabled = false;
+                            // If the user hasn't specified a new enabled status, then use the existing status
+                            if (cmdMap.get("enabled") == null) {
+                                deviceEnabled = oldDevice.getEnabled();
+                            } else {
+                                if (cmdMap.get("enabled").toLowerCase().equals("true")) {
+                                    deviceEnabled = true;
+                                }
+                            }
+
+                            String display = null;
+                            if (cmdMap.get("text") != null) {
+                                display = cmdMap.get("text");
+                                StreetSign sign = new StreetSign(oldDevice.getId(), oldDevice.getLocation(), deviceEnabled, display);
+                                
+                                modelService.destroyDevice(oldDevice, cityId);
+                                modelService.defineDevice(sign, cityId);
+                                System.out.println("Updated device: " + modelService.getDevice(cityId, deviceId));
+
+                            } else {
+                                modelService.updateDevice(oldDevice, oldDevice.getLocation(), deviceEnabled);
+                                System.out.println("Updated device: " + modelService.getDevice(cityId, deviceId));
+                            }
+
+                            break;
+                        
+                        case "info-kiosk":
+                            System.out.println("Updating existing Info Kiosk");
+                            
+                            // When updating a streetsign, the command may specify the following arguments
+                            args = new String[]{"info-kiosk", "enabled", "image"};
+                            // Populate a new mapping of arguments to properties
+                            cmdMap = parseArgs (cmds, args);
+
+                            // Need to split the city id from the device id
+                            cityId = null; 
+                            deviceId = null;
+                            try {
+                                String ids[] = cmdMap.get("info-kiosk").split(":"); 
+                                cityId = ids[0]; 
+                                deviceId = ids[1];
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                e.printStackTrace();
+                            }
+
+
+
+                            // First retrieve the old IOTdevice
+                            oldDevice = modelService.getDevice(cityId, deviceId);
+                            System.out.println("got old device: " + oldDevice);
+                            System.out.println(oldDevice.getClass());
+                            
+                            // User can only modify the display text OR if the device is enabled
+                            deviceEnabled = false;
+                            // If the user hasn't specified a new enabled status, then use the existing status
+                            if (cmdMap.get("enabled") == null) {
+                                deviceEnabled = oldDevice.getEnabled();
+                            } else {
+                                if (cmdMap.get("enabled").toLowerCase().equals("true")) {
+                                    deviceEnabled = true;
+                                }
+                            }
+
+                            System.out.println("IMAGE: "+cmdMap.get("image"));
+
+                            String image = null;
+                            if (cmdMap.get("image") != null) {
+                                image = cmdMap.get("image");
+                                InfoKiosk kiosk = new InfoKiosk(oldDevice.getId(), oldDevice.getLocation(), deviceEnabled, image);
+                                
+                                modelService.destroyDevice(oldDevice, cityId);
+                                modelService.defineDevice(kiosk, cityId);
+                                System.out.println("New device: " + modelService.getDevice(cityId, deviceId));
+
+                            } else {
+                                modelService.updateDevice(oldDevice, oldDevice.getLocation(), deviceEnabled);
+                                System.out.println("New device: " + modelService.getDevice(cityId, deviceId));
+                            }
+
+                            break;
+
+                        case "street-light":
+                            System.out.println("Updating existing Street Light");
+
+                            // When updating a streetsign, the command may specify the following arguments
+                            args = new String[]{"street-light", "enabled", "brightness"};
+                            // Populate a new mapping of arguments to properties
+                            cmdMap = parseArgs (cmds, args);
+
+                            // Need to split the city id from the device id
+                            cityId = null; 
+                            deviceId = null;
+                            try {
+                                String ids[] = cmdMap.get("street-light").split(":"); 
+                                cityId = ids[0]; 
+                                deviceId = ids[1];
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                e.printStackTrace();
+                            }
+
+                            // First retrieve the old IOTdevice
+                            oldDevice = modelService.getDevice(cityId, deviceId);
+
+                            // User can only modify the display text OR if the device is enabled
+                            deviceEnabled = false;
+                            // If the user hasn't specified a new enabled status, then use the existing status
+                            if (cmdMap.get("enabled") == null) {
+                                deviceEnabled = oldDevice.getEnabled();
+                            } else {
+                                if (cmdMap.get("enabled").toLowerCase().equals("true")) {
+                                    deviceEnabled = true;
+                                }
+                            }
+
+                            int brightness = 0;
+                            if (cmdMap.get("brightness") != null) {
+                                
+                                // Convert brightness input string to int
+                                try {
+                                    brightness = Integer.parseInt(cmdMap.get("brightness"));
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
+                                }
+
+                                StreetLight light = new StreetLight(oldDevice.getId(), oldDevice.getLocation(), deviceEnabled, brightness);
+                                
+                                modelService.destroyDevice(oldDevice, cityId);
+                                modelService.defineDevice(light, cityId);
+                                System.out.println("Updated device: " + modelService.getDevice(cityId, deviceId));
+
+                            } else {
+                                modelService.updateDevice(oldDevice, oldDevice.getLocation(), deviceEnabled);
+                                System.out.println("Updated device: " + modelService.getDevice(cityId, deviceId));
+                            }
+
+                            break;
+
+                        case "parking-space":
+                            System.out.println("Updating existing Parking Space");
+
+                            // When updating a streetsign, the command may specify the following arguments
+                            args = new String[]{"parking-space", "enabled", "rate"};
+                            // Populate a new mapping of arguments to properties
+                            cmdMap = parseArgs (cmds, args);
+
+                            // Need to split the city id from the device id
+                            cityId = null; 
+                            deviceId = null;
+                            try {
+                                String ids[] = cmdMap.get("parking-space").split(":"); 
+                                cityId = ids[0]; 
+                                deviceId = ids[1];
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                e.printStackTrace();
+                            }
+
+                            // First retrieve the old IOTdevice
+                            oldDevice = modelService.getDevice(cityId, deviceId);
+
+                            // User can only modify the display text OR if the device is enabled
+                            deviceEnabled = false;
+                            // If the user hasn't specified a new enabled status, then use the existing status
+                            if (cmdMap.get("enabled") == null) {
+                                deviceEnabled = oldDevice.getEnabled();
+                            } else {
+                                if (cmdMap.get("enabled").toLowerCase().equals("true")) {
+                                    deviceEnabled = true;
+                                }
+                            }
+
+                            int rate = 0;
+                            if (cmdMap.get("rate") != null) {
+                                
+                                // Convert rate input string to int
+                                try {
+                                    rate = Integer.parseInt(cmdMap.get("rate"));
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
+                                }
+
+                                ParkingSpace parkingSpace = new ParkingSpace(oldDevice.getId(), oldDevice.getLocation(), deviceEnabled, rate);
+                                
+                                modelService.destroyDevice(oldDevice, cityId);
+                                modelService.defineDevice(parkingSpace, cityId);
+                                System.out.println("Updated device: " + modelService.getDevice(cityId, deviceId));
+
+                            } else {
+                                modelService.updateDevice(oldDevice, oldDevice.getLocation(), deviceEnabled);
+                                System.out.println("Updated device: " + modelService.getDevice(cityId, deviceId));
+                            }
+
+                            break;
+
+                        case "robot":
+                            System.out.println("Updating existing Robot");
+
+                            // When updating a streetsign, the command may specify the following arguments
+                            args = new String[]{"robot", "lat", "long", "enabled", "activity"};
+                            // Populate a new mapping of arguments to properties
+                            cmdMap = parseArgs (cmds, args);
+
+                            // Need to split the city id from the device id
+                            cityId = null; 
+                            deviceId = null;
+                            try {
+                                String ids[] = cmdMap.get("robot").split(":"); 
+                                cityId = ids[0]; 
+                                deviceId = ids[1];
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                e.printStackTrace();
+                            }
+
+                            // First retrieve the old IOTdevice
+                            oldDevice = modelService.getDevice(cityId, deviceId);
+
+                            // User can only modify the display text OR if the device is enabled
+                            deviceEnabled = false;
+                            // If the user hasn't specified a new enabled status, then use the existing status
+                            if (cmdMap.get("enabled") == null) {
+                                deviceEnabled = oldDevice.getEnabled();
+                            } else {
+                                if (cmdMap.get("enabled").toLowerCase().equals("true")) {
+                                    deviceEnabled = true;
+                                }
+                            }
+
+                            // Update the location object
+                            float robotLat = 0;
+                            float robotLong = 0;
+                            Location location = oldDevice.getLocation();
+                            if (cmdMap.get("lat") != null && cmdMap.get("long") != null) {
+                                // Location constructor arguments accept floats, must convert
+                                try {
+                                    robotLat = Float.parseFloat(cmdMap.get("lat"));
+                                    robotLong = Float.parseFloat(cmdMap.get("long"));
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
+                                }
+                                location = new Location(robotLat, robotLong);
+                            }
+
+                            String activity = null;
+                            if (cmdMap.get("activity") != null) {
+                                
+                                activity = cmdMap.get("activity");
+
+                                Robot robot = new Robot(oldDevice.getId(), location, deviceEnabled, activity);
+                                
+                                modelService.destroyDevice(oldDevice, cityId);
+                                modelService.defineDevice(robot, cityId);
+                                System.out.println("Updated device: " + modelService.getDevice(cityId, deviceId));
+
+                            } else {
+                                modelService.updateDevice(oldDevice, oldDevice.getLocation(), deviceEnabled);
+                                System.out.println("Updated device: " + modelService.getDevice(cityId, deviceId));
+                            }
+
+                            break;
+
+                        case "vehicle":
+                            System.out.println("Updating existing Vehicle");
+
+                            // When updating a streetsign, the command may specify the following arguments
+                            args = new String[]{"vehicle", "lat", "long", "enabled", "activity", "fee"};
+                            // Populate a new mapping of arguments to properties
+                            cmdMap = parseArgs (cmds, args);
+
+                            // Need to split the city id from the device id
+                            cityId = null; 
+                            deviceId = null;
+                            try {
+                                String ids[] = cmdMap.get("vehicle").split(":"); 
+                                cityId = ids[0]; 
+                                deviceId = ids[1];
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                e.printStackTrace();
+                            }
+
+                            // First retrieve the old IOTdevice
+                            oldDevice = modelService.getDevice(cityId, deviceId);
+
+                            // User can only modify the display text OR if the device is enabled
+                            deviceEnabled = false;
+                            // If the user hasn't specified a new enabled status, then use the existing status
+                            if (cmdMap.get("enabled") == null) {
+                                deviceEnabled = oldDevice.getEnabled();
+                            } else {
+                                if (cmdMap.get("enabled").toLowerCase().equals("true")) {
+                                    deviceEnabled = true;
+                                }
+                            }
+
+                            // Update the location object
+                            float vehicleLat = 0;
+                            float vehicleLong = 0;
+                            location = oldDevice.getLocation();
+                            if (cmdMap.get("lat") != null && cmdMap.get("long") != null) {
+                                // Location constructor arguments accept floats, must convert
+                                try {
+                                    vehicleLat = Float.parseFloat(cmdMap.get("lat"));
+                                    vehicleLong = Float.parseFloat(cmdMap.get("long"));
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
+                                }
+                                location = new Location(vehicleLat, vehicleLong);
+                            }
+
+                            activity = null;
+                            if (cmdMap.get("activity") != null) {
+                                activity = cmdMap.get("activity");
+                            } else {
+                                activity = oldDevice.getActivity();
+                            }
+
+                            rate = 0;
+                            if (cmdMap.get("rate") != null) {
+                                // Convert rate input string to int
+                                try {
+                                    rate = Integer.parseInt(cmdMap.get("rate"));
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
+                                }                        
+                            } else {
+                                rate = oldDevice.getFee();
+                            }
+
+                            IOTDevice vehicle = null;
+                            if (deviceId.toLowerCase().contains("car")) {
+                                vehicle = new Car(oldDevice.getId(), location, deviceEnabled, activity, oldDevice.getCapacity(), rate);
+                            } else {
+                                vehicle = new Bus(oldDevice.getId(), location, deviceEnabled, activity, oldDevice.getCapacity(), rate);
+                            }
+                            
+                            modelService.destroyDevice(oldDevice, cityId);
+                            modelService.defineDevice(vehicle, cityId);
+                            System.out.println("Updated device: " + modelService.getDevice(cityId, deviceId));
 
                             break;
 
@@ -341,7 +713,7 @@ public class CommandProcessor {
                             // Create a new street sign object
                             IOTDevice robot = new Robot(deviceId, deviceLocation, deviceEnabled, cmdMap.get("activity"));
                             // Add the iotdevice to the user specified city  
-                            System.out.println("Created new IoTDevice: " + modelService.defineDevice(robot, cityId) + " for city: " + cityId);
+                            System.out.println("Created new IoTDevice: " + robot + " for city: " + modelService.defineDevice(robot, cityId));
                             
                             break;
 
@@ -395,7 +767,7 @@ public class CommandProcessor {
 
                             // Create a new street sign object
                             // Add the iotdevice to the user specified city  
-                            System.out.println("Created new IoTDevice: " + modelService.defineDevice(vehicle, cityId) + " for city: " + cityId);
+                            System.out.println("Created new IoTDevice: " + vehicle + " for city: " + modelService.defineDevice(vehicle, cityId));
                             
                             break;
 

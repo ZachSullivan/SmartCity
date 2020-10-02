@@ -14,8 +14,8 @@ public class StreetSign extends IOTDevice {
 
 	public String toString() { 
         String result = (
-            "Street Sign: " + super.getId() + 
-            " Displaying: " + this.getDisplay()
+			super.toString() + " is a Street Sign currently enabled: " + super.getEnabled() +
+			" Displaying: " + this.getDisplay()
         ); 
         return result;
     }

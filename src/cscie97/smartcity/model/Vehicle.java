@@ -17,6 +17,16 @@ public abstract class Vehicle extends IOTDevice {
 		this.fee = fee;
 	}
 
+	public int getFee() {
+		return this.fee;
+	}
 
+	public String getActivity() {
+		return this.activity;
+	}
+
+	public int getCapacity() {
+		return this.capacity;
+	}
 
 }

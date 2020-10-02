@@ -13,4 +13,16 @@ public class Robot extends IOTDevice {
 		this.action = activity;
 	}
 
+	public String getAction() {
+		return this.action;
+	}
+
+	public String toString() { 
+        String result = (
+			super.toString() + " is a Robot currently enabled: " + super.getEnabled() +
+			" Performing: " + this.getAction()
+        ); 
+        return result;
+    }
+
 }

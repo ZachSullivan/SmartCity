@@ -55,6 +55,12 @@ public class City {
 		return virtualIOT.getId();
 	}
 
+	// Removes a specified IOT device from the city's map of devices. 
+	public VirtualIOT removeIoT(IOTDevice device) {
+
+		return this.IOTDeviceMap.remove(device.getId());
+	} 
+
 	public String toString() { 
         String result = (
             this.getId() + 
@@ -62,6 +68,5 @@ public class City {
             " Located at: " + this.getLocation()
         ); 
         return result;
-    } 
-
+    }
 }
