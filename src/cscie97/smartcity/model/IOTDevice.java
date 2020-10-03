@@ -34,25 +34,40 @@ public abstract class IOTDevice {
 		return this.enabled;
 	}
 
+	public Status getStatus() {
+		return this.status;
+	}
+
 	public Location getLocation() {
 		return this.location;
+	}
+
+	public Event getCurrentEvent() {
+		return this.currentEvent;
 	}
 
 	public void setLocation(Location location) {
 		this.location = location;
 	}
 
+	public void setCurrentEvent(Event event) {
+		this.currentEvent = event;
+	}
+
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled; 
+		//if (this.enabled == false) {
+			//this.status
+		//}
 	}
 
 	public String toString() { 
         String result = (
-			"[IoT device: " + this.getId() +
-			"]" 
+			"[IoT device: " + this.getId() + "]" +
+			"\nAction: " + (this.getCurrentEvent() != null ? this.getCurrentEvent() : this.getStatus())
+			
         ); 
         return result;
     }
-
 
 }

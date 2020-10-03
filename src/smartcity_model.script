@@ -105,7 +105,7 @@ show device city_1
 
 
 # Simulate a device sensor event
-# create sensor-event <city_id>[:<device_id>] type (microphone|camera|thermometer|co2meter) value <string> [subject <person_id>]
+# create sensor-event <city_id>[:<device_id>] type (microphone|camera|thermometer|co2meter|status) value <string> [subject <person_id>]
 
 create sensor-event city_1:bus_1 type microphone value "does this bus go to Central Square?" subject jane
 create sensor-event city_1:bus_1 type camera value "person boarding bus" subject jane
@@ -149,4 +149,3 @@ update visitor visitor_1  lat 42.3830 long -71.1125
 
 show person resident_1
 show person visitor_1
-

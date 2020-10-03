@@ -14,8 +14,9 @@ public class InfoKiosk extends IOTDevice {
 
 	public String toString() { 
         String result = (
-			super.toString() + " is an Info Kiosk currently enabled: " + super.getEnabled() +
-			" Displaying: " + this.getDisplay()
+			super.toString() + " is an Info Kiosk" +
+			"\nisEnabled: " + super.getEnabled() +
+			"\nDisplaying: " + this.getDisplay()
         ); 
         return result;
     }

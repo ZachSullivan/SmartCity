@@ -19,21 +19,23 @@ public class VirtualIOT {
 	public IOTDevice getPhysicalDevice () {
 		return this.phyiscalIoT;
 	}
-
-	public String getCommand(String command) {
-		return null;
-	}
-
+	
 	public Event getEvent(Event event) {
-		return null;
+		return this.phyiscalIoT.getCurrentEvent();
 	}
 
-	public void sendCommand(String command) {
-
+	// Receieves a command from a controller, passes along to a physical IoT device in the form of an Event
+	// Note removed getCommand as it is dedundant.
+	// Controller that wants to issue a command will just call this method
+	public void sendCommand(String command, Person subject) {
+		
+		Event event = new Event("Command", command, subject);
+		// Pass the newly created event to the physical IoT device
+		this.sendEvent(event);
 	}
 
 	public void sendEvent(Event event) {
-
+		phyiscalIoT.setCurrentEvent(event);
 	}
 
 }

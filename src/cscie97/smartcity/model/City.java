@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class City {
 
-	private static String id;
+	private String id;
 	private String name;
 	private String cityAccount;
 	private int radius;
@@ -23,7 +23,7 @@ public class City {
 	}
 	
 	public String getId () {
-		return City.id;
+		return this.id;
 	}
 
 	public String getName () {

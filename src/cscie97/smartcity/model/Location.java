@@ -11,4 +11,18 @@ public class Location {
 		this.longitude = longitude;
 	}
 
+	public float getLatitude () {
+		return this.latitude;
+	}
+
+	public float getLongitiude () {
+		return this.longitude;
+	}
+	public String toString() { 
+        String result = (
+            "Location [lat: " + this.getLatitude() + 
+			"],[long: " + this.getLongitiude() + "]"
+        ); 
+        return result;
+    }
 }

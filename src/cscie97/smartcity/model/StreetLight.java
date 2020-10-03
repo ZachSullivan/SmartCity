@@ -15,8 +15,9 @@ public class StreetLight extends IOTDevice {
 
 	public String toString() { 
         String result = (
-			super.toString() + " is a Street Light currently enabled: " + super.getEnabled() +
-			" Brightness: " + this.getBrightness()
+			super.toString() + " is a Street Light" +
+			"\nisEnabled: " + super.getEnabled() +
+			"\nBrightness: " + this.getBrightness()
         ); 
         return result;
     }
