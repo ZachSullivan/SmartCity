@@ -1,7 +1,36 @@
+
 define city city_1 name Cambridge-MA account cambridge-account lat 42.3766 long -71.1160 radius 100
 
+define city city_1 name Boston-MA account boston-account lat 22.3000 long -95.0002 radius 50
+# Expect failure, City already exists with ID
+
+define city city_2 name Cambridge2-MA account cambridge2-account lat 42.3766 long -71.1160 radius 100
+# Expect failure, City overlaps existing city
+
+
+define visitor visitor_1 bio-metric "iris-print='irisprint-visitor_1'" lat 42.3744 long -71.1203
+
+define visitor visitor_1 bio-metric "iris-print='irisprint-visitor_1'" lat 42.3744 long -71.1203 
+# Expect failure, person already exists
+
+show person resident_1
+# Expect failure, person doesn't exist
+
+define visitor visitor_2 bio-metric "iris-print='irisprint-visitor_2'" lat 42.0000 long 70.0000 
+
+define resident resident_1 name bob bio-metric "voice-print='voiceprint-bob',face-print='faceprint-bob'" phone 781-555-5544 role adult lat 42.5555 long -71.5555 account bobs_account
+
+define resident resident_2 name jane bio-metric "voice-print='voiceprint-jane',face-print='faceprint-jane'" phone 781-222-3344 role adult lat 42.3735 long -71.1205 account janes_account
+
 show city city_1
+# Expect to see no devices listed, only 3 people
 
 define street-sign city_1:ss_1 lat 42.3732 long -71.1202 enabled  true  text "Welcome to Harvard Square"
+
+create sensor-event city_1:bus_1 type microphone value "does this bus go to Cambridge?" subject chris
+# Expect failure, person doesn't exist
+
+create sensor-event city_1:ss_2 type thermometer value 80  
+# Expect failure, device doesn't exist
 
 show device city_1:ss_1

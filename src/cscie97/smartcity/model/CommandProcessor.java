@@ -3,6 +3,7 @@ package cscie97.smartcity.model;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -11,11 +12,11 @@ import java.util.Scanner;
 * Commands are executed by the ledger service.
 *
 * @author  Zachary Sullivan
-* @since   2020-09-13 
+* @since   2020-10-05 
 */
 public class CommandProcessor {
 
-    // NOTE: This will only support 1 legder at a time, doc doesnt specify more than one simulatenously so keeping as is.
+    // NOTE: This will only support 1 model service at a time, doc doesnt specify more than one simulatenously
     ModelService modelService = null;
 
     public CommandProcessor() {
@@ -61,13 +62,28 @@ public class CommandProcessor {
 
         String args[];
         Map<String, String> cmdMap;
-
-        // Skip any blank commands or commands denoted as a comment (start with '#')
+        
+        // Skip any commands denoted as a comment (start with '#')
         if (!cmds[0].equals("#")) {
+            // Print a new line after each command processed
+            System.out.println();
             // Process user command based on first element in command string either define, update or show
             switch(cmds[0]) {   
                 case "show":
                     switch(cmds[1]) { 
+
+                        case "person":
+                            System.out.println("Retrieving Person");
+
+                            // Command should specify the following arguments
+                            args = new String[]{"person"};
+                            // Populate a new mapping of arguments to properties
+                            cmdMap = parseArgs (cmds, args);
+
+                            System.out.println(modelService.getPerson(cmdMap.get("person")));
+                            System.out.println();
+                            break;
+
                         case "device":
                             // Command should specify the following arguments
                             args = new String[]{"device"};
@@ -78,15 +94,10 @@ public class CommandProcessor {
                             if (cmdMap.get("device").contains(":")) {
                                 System.out.println("Retrieving a Device");
                                 // Need to split the city id from the device id
-                                String cityId = null; 
-                                String deviceId = null;
-                                try {
-                                    String ids[] = cmdMap.get("device").split(":"); 
-                                    cityId = ids[0]; 
-                                    deviceId = ids[1];
-                                } catch (ArrayIndexOutOfBoundsException e) {
-                                    e.printStackTrace();
-                                }
+                                String[] ids = parseIds(cmdMap.get("device"));
+
+                                String cityId = ids[0]; 
+                                String deviceId = ids[1];
                                 System.out.println(modelService.getDevice(cityId, deviceId).getPhysicalDevice());
                             } else {
                                 System.out.println("Retrieving all Devices within city: " + cmdMap.get("device"));
@@ -103,10 +114,7 @@ public class CommandProcessor {
                             break;
                         
                         case "city":
-                            /**
-                             * NOTE THE OUTPUT OF THIS COMMAND SHOULD ALSO SHOW PEOPLE AND IOT DEVICES WITHIN THE REQUESTED CITY
-                             * Therefore Ill need to obtain all persons and devices within the city radius using the Haversine method
-                             */
+
                             System.out.println("Retrieving City");
 
                             // Command should specify the following arguments
@@ -115,12 +123,54 @@ public class CommandProcessor {
                             cmdMap = parseArgs (cmds, args);
 
                             System.out.println(modelService.getCity(cmdMap.get("city")));
+                            System.out.println();
+
+                            System.out.println("City devices:");
+                            Map<String, VirtualIOT> devices = modelService.getDevices(cmdMap.get("city"));
+                            for (Map.Entry<String, VirtualIOT> deviceEntry:devices.entrySet()){
+                                System.out.println(deviceEntry.getValue().getPhysicalDevice());
+                                System.out.println();
+                            }
+                            
+                            System.out.println("City people:");
+                            List<Person> persons = modelService.getPersons(cmdMap.get("city"));
+                            for (Person person:persons){
+                                System.out.println(person);
+                                System.out.println();
+                            }
                             break;
                     }
                     break;
 
                 case "create":
                     switch(cmds[1]) { 
+                        case "sensor-output":
+                            System.out.println("New Event Output...");
+                            
+                            // Command should specify the following arguments
+                            args = new String[]{"sensor-output", "type", "value"};
+                            // Populate a new mapping of arguments to properties
+                            cmdMap = parseArgs (cmds, args);
+
+                            String cityId = null; 
+                            String deviceId = null;
+                            if (cmdMap.get("sensor-output").contains(":")) {
+                                String[] ids = parseIds(cmdMap.get("sensor-output"));
+
+                                cityId = ids[0]; 
+                                deviceId = ids[1];
+                            } else {
+                                cityId = cmdMap.get("sensor-output");
+                            }
+
+                            // Display to the user the simulated event
+                            System.out.println("Event was output:");
+                            Map<VirtualIOT, Event> events = modelService.deviceOutput(cityId, deviceId, cmdMap.get("type"), cmdMap.get("value"));
+                            for (Map.Entry<VirtualIOT, Event> event:events.entrySet()) {
+                                IOTDevice device = event.getKey().getPhysicalDevice();
+                                System.out.println( device.getId() + " was issued " + event.getValue());
+                            }
+                            break;
                         case "sensor-event":
 
                             System.out.println("Simulating new Event...");
@@ -130,15 +180,10 @@ public class CommandProcessor {
                             // Populate a new mapping of arguments to properties
                             cmdMap = parseArgs (cmds, args);
 
-                            String cityId = null; 
-                            String deviceId = null;
-                            try {
-                                String ids[] = cmdMap.get("sensor-event").split(":"); 
-                                cityId = ids[0]; 
-                                deviceId = ids[1];
-                            } catch (ArrayIndexOutOfBoundsException e) {
-                                e.printStackTrace();
-                            }
+                            String[] ids = parseIds(cmdMap.get("sensor-event"));
+
+                            cityId = ids[0]; 
+                            deviceId = ids[1];
 
                             modelService.simulateEvent(
                                 cityId, 
@@ -151,8 +196,6 @@ public class CommandProcessor {
                             // Display to the user the simulated event
                             System.out.println("Event was simulated for following device:");
                             System.out.println(modelService.getDevice(cityId, deviceId).getPhysicalDevice());
-                            System.out.println();
-
                             break;
                     }
                     break;  
@@ -289,15 +332,10 @@ public class CommandProcessor {
                             cmdMap = parseArgs (cmds, args);
 
                             // Need to split the city id from the device id
-                            String cityId = null; 
-                            String deviceId = null;
-                            try {
-                                String ids[] = cmdMap.get("street-sign").split(":"); 
-                                cityId = ids[0]; 
-                                deviceId = ids[1];
-                            } catch (ArrayIndexOutOfBoundsException e) {
-                                e.printStackTrace();
-                            }
+                            String[] ids = parseIds(cmdMap.get("street-sign"));
+
+                            String cityId = ids[0]; 
+                            String deviceId = ids[1];
 
                             // First retrieve the old IOTdevice
                             VirtualIOT oldVDevice = modelService.getDevice(cityId, deviceId);
@@ -336,15 +374,10 @@ public class CommandProcessor {
                             cmdMap = parseArgs (cmds, args);
 
                             // Need to split the city id from the device id
-                            cityId = null; 
-                            deviceId = null;
-                            try {
-                                String ids[] = cmdMap.get("info-kiosk").split(":"); 
-                                cityId = ids[0]; 
-                                deviceId = ids[1];
-                            } catch (ArrayIndexOutOfBoundsException e) {
-                                e.printStackTrace();
-                            }
+                            ids = parseIds(cmdMap.get("info-kiosk"));
+
+                            cityId = ids[0]; 
+                            deviceId = ids[1];
 
                             // First retrieve the old IOTdevice
                             oldVDevice = modelService.getDevice(cityId, deviceId);
@@ -385,15 +418,10 @@ public class CommandProcessor {
                             cmdMap = parseArgs (cmds, args);
 
                             // Need to split the city id from the device id
-                            cityId = null; 
-                            deviceId = null;
-                            try {
-                                String ids[] = cmdMap.get("street-light").split(":"); 
-                                cityId = ids[0]; 
-                                deviceId = ids[1];
-                            } catch (ArrayIndexOutOfBoundsException e) {
-                                e.printStackTrace();
-                            }
+                            ids = parseIds(cmdMap.get("street-light"));
+
+                            cityId = ids[0]; 
+                            deviceId = ids[1];
 
                             // First retrieve the old IOTdevice
                             oldVDevice = modelService.getDevice(cityId, deviceId);
@@ -441,15 +469,10 @@ public class CommandProcessor {
                             cmdMap = parseArgs (cmds, args);
 
                             // Need to split the city id from the device id
-                            cityId = null; 
-                            deviceId = null;
-                            try {
-                                String ids[] = cmdMap.get("parking-space").split(":"); 
-                                cityId = ids[0]; 
-                                deviceId = ids[1];
-                            } catch (ArrayIndexOutOfBoundsException e) {
-                                e.printStackTrace();
-                            }
+                            ids = parseIds(cmdMap.get("parking-space"));
+
+                            cityId = ids[0]; 
+                            deviceId = ids[1];
 
                             // First retrieve the old IOTdevice
                             oldVDevice = modelService.getDevice(cityId, deviceId);
@@ -498,15 +521,10 @@ public class CommandProcessor {
                             cmdMap = parseArgs (cmds, args);
 
                             // Need to split the city id from the device id
-                            cityId = null; 
-                            deviceId = null;
-                            try {
-                                String ids[] = cmdMap.get("robot").split(":"); 
-                                cityId = ids[0]; 
-                                deviceId = ids[1];
-                            } catch (ArrayIndexOutOfBoundsException e) {
-                                e.printStackTrace();
-                            }
+                            ids = parseIds(cmdMap.get("robot"));
+
+                            cityId = ids[0]; 
+                            deviceId = ids[1];
 
                             // First retrieve the old IOTdevice
                             oldVDevice = modelService.getDevice(cityId, deviceId);
@@ -557,16 +575,11 @@ public class CommandProcessor {
                             cmdMap = parseArgs (cmds, args);
 
                             // Need to split the city id from the device id
-                            cityId = null; 
-                            deviceId = null;
-                            try {
-                                String ids[] = cmdMap.get("vehicle").split(":"); 
-                                cityId = ids[0]; 
-                                deviceId = ids[1];
-                            } catch (ArrayIndexOutOfBoundsException e) {
-                                e.printStackTrace();
-                            }
+                            ids = parseIds(cmdMap.get("vehicle"));
 
+                            cityId = ids[0]; 
+                            deviceId = ids[1];
+                        
                             // First retrieve the old IOTdevice
                             oldVDevice = modelService.getDevice(cityId, deviceId);
                             oldDevice = oldVDevice.getPhysicalDevice();
@@ -621,7 +634,7 @@ public class CommandProcessor {
 
                             break;
 
-                        default:
+                        default: 
                             System.out.println("Unable to find entity to update.");
                             break;
                     }
@@ -679,7 +692,7 @@ public class CommandProcessor {
                             break;
 
                         case "street-sign":
-                            System.out.println("Defining a new Street Sign");
+                            System.out.println("DEFINING A NEW STREETSIGN...");
 
                             // Command should specify the following arguments
                             args = new String[]{"street-sign", "lat", "long", "enabled", "text"};
@@ -701,12 +714,13 @@ public class CommandProcessor {
                             // Create a new street sign object
                             StreetSign sign = new StreetSign(deviceId, deviceLocation, deviceEnabled, cmdMap.get("text"));
                             // Add the iotdevice to the user specified city  
-                            System.out.println("Created new IoTDevice: " + sign + " for city: " + modelService.defineDevice(sign, cityId));
+                            modelService.defineDevice(sign, cityId);
+                            System.out.println("Created new IoTDevice for city: " + cityId + "\n" + sign);
 
                             break;
                         
                         case "info-kiosk":
-                            System.out.println("Defining a new Info Kiosk");
+                            System.out.println("DEFINING A NEW INFOKIOSK...");
 
                             // Command should specify the following arguments
                             args = new String[]{"info-kiosk", "lat", "long", "enabled", "image"};
@@ -726,15 +740,16 @@ public class CommandProcessor {
                                 deviceEnabled = true;
                             }
 
-                            // Create a new street sign object
+                            // Create a new kiosk object
                             InfoKiosk kiosk = new InfoKiosk(deviceId, deviceLocation, deviceEnabled, cmdMap.get("image"));
                             // Add the iotdevice to the user specified city  
-                            System.out.println("Created new IoTDevice: " + kiosk + " for city: " + modelService.defineDevice(kiosk, cityId));
+                            modelService.defineDevice(kiosk, cityId);
+                            System.out.println("Created new IoTDevice for city: " + cityId + "\n" + kiosk);
                             
                             break;
                         
                         case "parking-space":
-                            System.out.println("Defining a new Parking Space");
+                            System.out.println("DEFINING A NEW PARKING SPACE...");
 
                             // Command should specify the following arguments
                             args = new String[]{"parking-space", "lat", "long", "enabled", "rate"};
@@ -755,15 +770,16 @@ public class CommandProcessor {
                                 deviceEnabled = true;
                             }
 
-                            // Create a new street sign object
+                            // Create a new parking space object
                             ParkingSpace parkingSpace = new ParkingSpace(deviceId, deviceLocation, deviceEnabled, rate);
                             // Add the iotdevice to the user specified city  
-                            System.out.println("Created new IoTDevice: " + parkingSpace + " for city: " + modelService.defineDevice(parkingSpace, cityId));
-                            
+                            modelService.defineDevice(parkingSpace, cityId);
+                            System.out.println("Created new IoTDevice for city: " + cityId + "\n" + parkingSpace);
+
                             break;
                         
                         case "street-light":
-                            System.out.println("Defining a new Street Light");
+                            System.out.println("DEFINING A NEW STREETLIGHT...");
 
                             // Command should specify the following arguments
                             args = new String[]{"street-light", "lat", "long", "enabled", "brightness"};
@@ -787,15 +803,15 @@ public class CommandProcessor {
                                 deviceEnabled = true;
                             }
 
-                            // Create a new street sign object
+                            // Create a new street light object
                             StreetLight light = new StreetLight(deviceId, deviceLocation, deviceEnabled, brightness);
                             // Add the iotdevice to the user specified city  
-                            System.out.println("Created new IoTDevice: " + light + " for city: " + modelService.defineDevice(light, cityId));
-                            
+                            modelService.defineDevice(light, cityId);
+                            System.out.println("Created new IoTDevice for city: " + cityId + "\n" + light);
                             break;
                         
                         case "robot":
-                            System.out.println("Defining a new Robot");
+                            System.out.println("DEFINING A NEW ROBOT...");
 
                             // Command should specify the following arguments
                             args = new String[]{"robot", "lat", "long", "enabled", "activity"};
@@ -815,15 +831,15 @@ public class CommandProcessor {
                                 deviceEnabled = true;
                             }
 
-                            // Create a new street sign object
+                            // Create a new robot object
                             Robot robot = new Robot(deviceId, deviceLocation, deviceEnabled, cmdMap.get("activity"));
                             // Add the iotdevice to the user specified city  
-                            System.out.println("Created new IoTDevice: " + robot + " for city: " + modelService.defineDevice(robot, cityId));
-                            
+                            modelService.defineDevice(robot, cityId);
+                            System.out.println("Created new IoTDevice for city: " + cityId + "\n" + robot);
                             break;
 
                         case "vehicle":
-                            System.out.println("Defining a new Vehicle");
+                            System.out.println("DEFINING A NEW VEHICLE...");
 
                             // Command should specify the following arguments
                             args = new String[]{"vehicle", "lat", "long", "enabled", "type", "activity", "capacity", "fee"};
@@ -834,14 +850,6 @@ public class CommandProcessor {
                             ids = parseIds(cmdMap.get("vehicle"));
                             cityId = ids[0]; 
                             deviceId = ids[1];
-
-                            /*try {
-                                String ids[] = cmdMap.get("vehicle").split(":"); 
-                                cityId = ids[0]; 
-                                deviceId = ids[1];
-                            } catch (ArrayIndexOutOfBoundsException e) {
-                                e.printStackTrace();
-                            }*/
 
                             int capacity = parseInt(cmdMap.get("capacity"));
                             int fee = parseInt(cmdMap.get("fee"));
@@ -855,17 +863,18 @@ public class CommandProcessor {
 
                             if (cmdMap.get("type").toLowerCase().equals("car")) {
                                 Car car = new Car(deviceId, deviceLocation, deviceEnabled, cmdMap.get("activity"), capacity, fee);
-                                System.out.println("Created new IoTDevice: " + car + " for city: " + modelService.defineDevice(car, cityId));
+                                modelService.defineDevice(car, cityId);
+                                System.out.println("Created new IoTDevice for city: " + cityId + "\n" + car);
                             } else {
                                 Bus bus = new Bus(deviceId, deviceLocation, deviceEnabled, cmdMap.get("activity"), capacity, fee);
-                                System.out.println("Created new IoTDevice: " + bus + " for city: " + modelService.defineDevice(bus, cityId));
-
+                                modelService.defineDevice(bus, cityId);
+                                System.out.println("Created new IoTDevice for city: " + cityId + "\n" + bus);
                             }
 
                             break;
 
                         case "city":
-                            System.out.println("Defining a new City");
+                            System.out.println("DEFINING A NEW CITY...");
 
                             // Define-city command should specify the following arguments
                             args = new String[]{"city", "name", "account", "lat", "long", "radius"};
@@ -888,7 +897,6 @@ public class CommandProcessor {
                             break;
                         
                         default:
-                            //System.out.println();
                             break;
                     }
                     break;
@@ -922,7 +930,7 @@ public class CommandProcessor {
                 while (fileScanner.hasNextLine()) {
                     try {
                         processCommand(fileScanner.nextLine()); 
-                    } catch (CommandProcessorException e) {
+                    } catch (CommandProcessorException | ModelServiceException e) {
                         System.out.println(e); 
                     }
                 }  
@@ -935,6 +943,12 @@ public class CommandProcessor {
         }
     }
 
+    /**
+     * Takes two lat long values as strings, converts to floats and creates a new Location object
+     * @param latitiude
+     * @param longitude
+     * @return  recently created location object
+     */
     private Location parseLocation (String latitiude, String longitude) {
 		float locLat = 0;
 		float locLong = 0;
@@ -949,6 +963,11 @@ public class CommandProcessor {
 		return new Location(locLat, locLong);
     }
     
+    /**
+     * Parses a string object into an integer
+     * @param input
+     * @return  parsed string as int
+     */
     private int parseInt (String input) {
         int result = 0;
 		try {
@@ -960,6 +979,10 @@ public class CommandProcessor {
 		return result;
     }
     
+    /**
+     * Takes a string input, and splits it into two ids based on a colon
+     * @return array of string ids
+     */
     private String[] parseIds (String input) {
         String[] result = null;
         try {

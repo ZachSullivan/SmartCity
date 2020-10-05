@@ -1,7 +1,15 @@
 package cscie97.smartcity.model;
 
+/**
+* The Resident class extends the functionality offered by the Person class,
+* by providing additional information regarding the identity of the person
+*
+* @author  Zachary Sullivan
+* @since   2020-10-05 
+*/
 public class Resident extends Person {
 
+	// Role for the resident
 	private enum ResidentRoles {
 		ADULT,
 		CHILD,

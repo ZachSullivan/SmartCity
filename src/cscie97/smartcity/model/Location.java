@@ -1,5 +1,11 @@
 package cscie97.smartcity.model;
 
+/**
+* The location class specifies the latitude and longitude of the given entity
+*
+* @author  Zachary Sullivan
+* @since   2020-10-05 
+*/
 public class Location {
 
 	// Note opted to change params to floats from strings per review feedback

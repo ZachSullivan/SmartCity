@@ -1,5 +1,12 @@
 package cscie97.smartcity.model;
 
+/**
+* The Event class details the IoT device’s sensory input, 
+* recording the type of sensor, the reading and optionally the subject
+*
+* @author  Zachary Sullivan
+* @since   2020-10-05 
+*/
 public class Event {
 
 	private String type;
@@ -38,7 +45,7 @@ public class Event {
 	public String toString() { 
         String result = (
 			this.getType() + 
-			" Event recorded: " +
+			" Event: " +
 			(this.getAction() != null ? this.getAction() : this.getValue())
         ); 
         return result;

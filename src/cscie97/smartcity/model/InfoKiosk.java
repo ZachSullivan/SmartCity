@@ -1,5 +1,13 @@
 package cscie97.smartcity.model;
 
+/**
+* The Infokiosk class offer specific information that resolves a user query via a dynamic text display. 
+* The infokiosk class extend the baseline iot device functionality, 
+* by offering a readable string display variable.
+*
+* @author  Zachary Sullivan
+* @since   2020-10-05 
+*/
 public class InfoKiosk extends IOTDevice {
 	private String display;
 

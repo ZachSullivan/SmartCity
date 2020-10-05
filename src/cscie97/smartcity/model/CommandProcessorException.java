@@ -6,7 +6,7 @@ package cscie97.smartcity.model;
 * Exception is thrown by the command processor class
 *
 * @author  Zachary Sullivan
-* @since   2020-09-13 
+* @since   2020-10-05 
 */
 public class CommandProcessorException extends Exception {
 

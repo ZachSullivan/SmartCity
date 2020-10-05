@@ -1,6 +1,12 @@
 package cscie97.smartcity.model;
 
-// REMOVING THIS CLASS, IT IS REDUNDANT: I COULD JUST SET THE EVENT TYPE TO BE THE SENSOR TYPE ENUM, NO NEED TO CREATE A SENSOR CLASS
+/**
+* Sensors provide information to IoT devices about the world around them, 
+* there are 5 varieties of sensors (Microphone, Camera, Thermometer or CO2 meter, STATUS)
+*
+* @author  Zachary Sullivan
+* @since   2020-10-05 
+*/
 public class Sensor {
 	
 	private enum SensorType {
@@ -47,6 +53,12 @@ public class Sensor {
 		return this.sensorType.toString();
 	}
 
+	/**
+	 * Creates a new event with optional person param
+	 * @param input		The input for the event
+	 * @param person	The optional person issuing the event
+	 * @return			The event created, null on failure
+	 */
 	public Event createEvent(String input, Person person) {
 
 		// Create a new event based on the current sensor type

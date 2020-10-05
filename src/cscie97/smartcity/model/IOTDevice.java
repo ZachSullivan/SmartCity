@@ -1,7 +1,16 @@
 package cscie97.smartcity.model;
 
+/**
+* The device class provides a variety of services to both city residents and visitors, 
+* including: Street Lights, Parking Meters, Street Signs, Information Kiosk, Robots, and Vehicles. 
+*
+* @author  Zachary Sullivan
+* @since   2020-10-05 
+*/
+
 public abstract class IOTDevice {
 
+	// Current status of the device, indicating current usage
 	private enum Status {
 		ONLINE,
 		OFFLINE
@@ -19,6 +28,7 @@ public abstract class IOTDevice {
 		this.enabled = enabled;
 		this.location = location;
 	}
+	// The following methods are overloaded to allow for up-classed vehicle objects to be readilly accessable
 	//Overload
 	public int getFee(){return 0;}
 	//Overload
@@ -56,9 +66,6 @@ public abstract class IOTDevice {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled; 
-		//if (this.enabled == false) {
-			//this.status
-		//}
 	}
 
 	public String toString() { 

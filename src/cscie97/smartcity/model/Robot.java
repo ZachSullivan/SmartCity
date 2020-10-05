@@ -1,12 +1,15 @@
 package cscie97.smartcity.model;
 
-import java.util.Map;
-
+/**
+* The Robot class offers action-based assistance to a given user. 
+* The robot class extends the device class by recording a requested action. 
+*
+* @author  Zachary Sullivan
+* @since   2020-10-05 
+*/
 public class Robot extends IOTDevice {
 
-	private Person issuer;
 	private String action;
-	private Map<Person, String[]> actionMap;
 
 	public Robot(String id, Location location, boolean enabled, String activity) {
 		super(id, enabled, location);
